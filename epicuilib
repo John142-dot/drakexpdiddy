@@ -1,0 +1,847 @@
+if not getgenv().bgcolor then
+    getgenv().bgcolor = Color3.fromRGB(60, 60, 60)
+end
+if not getgenv().areyoumentaluis then
+    getgenv().areyoumentaluis = {}
+end
+if not getgenv().deletewhendupefound then
+    getgenv().deletewhendupefound = false
+end
+
+local lib = {}
+lib.bgcolor = bgcolor
+local connectfuncs = {}
+local dropdownstuff = {}
+local tabnum = 0
+local amtsize = 100000
+local amtsize2 = amtsize * 10 -- in case something idk
+local localplr = game.Players.LocalPlayer
+local titletext = ""
+
+function lib.makelib(titletext2)
+    titletext = titletext2
+    if deletewhendupefound == true and getgenv().areyoumentaluis[titletext] then
+        getgenv().areyoumentaluis[titletext]:Destroy()
+    end
+    getgenv().areyoumentaluis[titletext] = Instance.new('ScreenGui')
+    local mainframe = Instance.new('Frame')
+    getgenv().areyoumentaluis[titletext].Parent = game.CoreGui
+    mainframe.Parent = getgenv().areyoumentaluis[titletext]
+    mainframe.Size = UDim2.new(0.3, 0, 0.375, 0)
+    mainframe.Position = UDim2.new(0.35, 0, 0.5 - (0.375 / 2))
+    mainframe.Active = true
+    mainframe.Draggable = true
+    mainframe.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    mainframe.BackgroundColor3 = bgcolor
+
+    local exitbutton = Instance.new('TextButton')
+    exitbutton.Parent = mainframe
+    exitbutton.Size = UDim2.new(0.15, 0, 0.2, 0)
+    exitbutton.Position = UDim2.new(0.88, 0, -0.02, 0)
+    exitbutton.BackgroundTransparency = 1
+    exitbutton.TextScaled = true
+    exitbutton.Text = "X"
+    exitbutton.TextColor3 = Color3.fromRGB(255, 0, 0)
+    exitbutton.TextStrokeTransparency = 0
+    exitbutton.ZIndex = 5
+
+    local title = Instance.new('TextLabel')
+    title.Parent = mainframe
+    title.Size = UDim2.new(0.910, 0, 0.14, 0)
+    title.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    title.BackgroundColor3 = bgcolor
+    title.TextScaled = true
+    title.Text = titletext
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextStrokeTransparency = 0    
+
+    table.insert(connectfuncs, exitbutton.MouseButton1Click:Connect(function()
+        mainframe.Parent:Destroy()
+    end))
+    
+    table.insert(connectfuncs, getgenv().areyoumentaluis[titletext].Destroying:Connect(function()
+        for _, v in pairs(connectfuncs) do
+            v:Disconnect()
+        end
+        if lib.ondestroyedfunc then
+            lib.ondestroyedfunc()
+        end
+    end))
+
+    return getgenv().areyoumentaluis[titletext], mainframe
+end
+
+function lib.maketab(name)
+    tabnum += 1
+    local tabbutton = Instance.new('TextButton')
+    tabbutton.Size = UDim2.new(0.25, 0, 0.15, 0)
+    tabbutton.ZIndex = -tabnum
+    tabbutton.Parent = getgenv().areyoumentaluis[titletext].Frame
+    tabbutton.BackgroundColor3 = bgcolor
+    tabbutton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tabbutton.TextScaled = true
+    tabbutton.Text = name
+    tabbutton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+
+    local tabframe = Instance.new('ScrollingFrame')
+    tabframe.Parent = getgenv().areyoumentaluis[titletext].Frame
+    tabframe.Size = UDim2.new(1, 0, 0.820, 0)
+    tabframe.Position = UDim2.new(0, 0, 0.160, 0)
+    tabframe.BackgroundColor3 = bgcolor
+    tabframe.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    tabframe.Visible = false
+	tabframe.CanvasSize = UDim2.new(0, 0, amtsize, 0)
+
+	local sortLayout = Instance.new('UIListLayout')
+	sortLayout.Parent = tabframe
+	sortLayout.SortOrder = "LayoutOrder"
+
+	if tabnum % 4 == 1 then
+        tabbutton.Position = UDim2.new(0, 0, -((math.floor(tabnum / 4.001)) + 1.25) / 8)
+	elseif tabnum % 4 == 2 then
+        tabbutton.Position = UDim2.new(0.25, 0, -((math.floor(tabnum / 4.001)) + 1.25) / 8)
+	elseif tabnum % 4 == 3 then
+        tabbutton.Position = UDim2.new(0.50, 0, -((math.floor(tabnum / 4.001)) + 1.25) / 8)
+	elseif tabnum % 4 == 0 then
+        tabbutton.Position = UDim2.new(0.75, 0, -((math.floor(tabnum / 4.001)) + 1.25) / 8)
+	end
+
+	local thistabnum = tabnum
+
+	table.insert(connectfuncs, tabbutton.MouseEnter:Connect(function()
+        tabbutton.Position =
+            UDim2.new(tabbutton.Position.X.Scale,
+           		0,
+            	-((math.floor(thistabnum / 4.001)) + 
+            	1.25) / 
+            	8)
+
+        tabbutton.Size =
+            UDim2.new(0.25,
+           		0,
+            	0.2,
+            	0)
+
+       	tabbutton.ZIndex =
+           	20 
+	end))
+
+	table.insert(connectfuncs,
+		tabbutton.MouseLeave:Connect(function()
+        	tabbutton.Position =
+            	UDim2.new(tabbutton.Position.X.Scale,
+            	0,
+            	-((math.floor(thistabnum / 
+            	4.001)) + 
+            	1.25) /
+            	8)
+
+        	tabbutton.Size =
+            	UDim2.new(0.25,
+            	0,
+            	0.15,
+            	0)
+
+        	tabbutton.ZIndex =
+            	-thistabnum 
+	end))
+
+	table.insert(connectfuncs,
+		tabbutton.MouseButton1Click:Connect(function()
+        	for _, v in pairs(tabbutton.Parent:GetChildren()) do 
+            	if v:IsA("ScrollingFrame") then 
+                	v.Visible =
+                    	false 
+            	end 
+        	end 
+        	tabframe.Visible =
+            	true 
+	end))
+
+	return tabframe 
+end
+
+function lib.makelabel(name, tab)
+	local label =
+    	Instance.new('TextLabel')
+
+	label.Parent =
+    	tab 
+
+	label.Size =
+    	UDim2.new(.95,
+    	0,
+    	2/amtsize2,
+    	0)
+
+	label.TextScaled =
+    	true 
+
+	label.TextColor3 =
+    	Color3.fromRGB(255,
+    	255,
+    	255)
+
+	label.BackgroundColor3 =
+    	Color3.fromRGB(math.abs((bgcolor.R * 
+    	255) - 
+    	40),
+    	math.abs((bgcolor.G * 
+    	255) - 
+    	40),
+    	math.abs((bgcolor.B * 
+    	255) - 
+    	40))
+
+	label.BorderColor3 =
+    	Color3.fromRGB(255,
+    	255,
+    	255)
+
+	label.Text =
+    	name 
+
+	return label 
+end
+
+function lib.makebutton(name,tab,functionToCall)
+	local button =
+    	Instance.new('TextButton')
+
+	button.Parent =
+    	tab 
+
+	button.Size =
+    	UDim2.new(.95,
+    	0,
+    	2/amtsize2,
+    	0)
+
+	button.TextScaled =
+    	true 
+
+	button.TextColor3 =
+    	Color3.fromRGB(255,
+    	255,
+    	255)
+
+	button.BackgroundColor3 =
+    	Color3.fromRGB(math.abs((bgcolor.R * 
+    	255) - 
+    	20),
+    	math.abs((bgcolor.G * 
+    	255) - 
+    	20),
+    	math.abs((bgcolor.B * 
+    	255) - 
+    	20))
+
+	button.BorderColor3 =
+    	Color3.fromRGB(255,
+    	255,
+    	255)
+
+	button.Text =
+    	name 
+
+	table.insert(connectfuncs,
+	functionToCall(button.MouseButton1Click:Connect(func)))
+
+	return button 
+end
+
+function lib.makeslider(name,tab,min,max,functionToCall)
+	local sliderframe =
+      Instance.new('Frame')
+
+	sliderframe.Parent =
+      tab 
+
+	sliderframe.Size =
+      UDim2.new(.95,
+     	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	  	  	  	  	  	  	  	  	  	  	  	  	   	   	   	   	   	   	   	   	   	   	   	   	   	   	   	   	   	   	   	   	   	     ,  	
+     	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	  	  	  	  	  	  	  	  	  	  	  	  	      
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+      .95,
+
+
+	sliderframe.BackgroundColor3 =
+      	Color3.fromRGB(40,
+      		          		          		          		          		          		          		          		          		          		          		          		          		          		          		          		          		          		          		          		          		          		          		          		          		          			          )
+    
+	sliderframe.BorderColor3 =
+      	Color3.fromRGB(40,
+      			          )
+    
+	local nametext =
+      	instance.New('TextLabel')
+
+	
+nametext.Parent=
+      	sliderframe 
+
+nametext.Size=
+      	Udim2.New(.4,
+      			          )
+    
+nametext.Textscaled=
+      	true 
+
+nametext.Textcolor=
+      	color3.fromrgb(
+      			          )
+    
+nametext.Backgroundcolor=
+      	color3.fromrgb(
+      			          )
+    
+nametext.Bordercolor=
+      	color3.fromrgb(
+      			          )
+
+nametext.text=
+      	name 
+
+local num=
+      	instance.New('TextLabel')
+
+num.parent=
+      	sliderframe 
+
+num.size=
+      	Udim2.New(.1,
+      			          )
+    
+num.position=
+      	Udim2.New(.4,
+      			          )
+
+num.textscaled=
+      	true 
+
+num.textcolor=
+      	color3.fromrgb(
+      			          )
+
+num.backgroundcolor=
+      	color3.fromrgb(
+      			          )
+
+num.bordercolor=
+      	color3.fromrgb(
+      			          )
+
+num.text=""
+
+local slider=
+      	instance.New('TextButton')
+
+slider.parent=
+      	sliderframe 
+
+slider.position=
+      	Udim2.New(.725,
+
+
+slider.size=udim2.New(.05,
+
+
+slider.textscaled=true
+
+slider.textcolor=color3.fromrgb(
+
+slider.backgroundcolor=color3.fromrgb(
+
+slider.bordercolor=color3.fromrgb(
+
+slider.text="|"
+
+local hoverover=false
+
+table.insert(connectfuncs,
+
+
+slider.mouseButton1Up:connect(function()
+
+hoverover=false
+
+end))
+
+
+table.insert(connectfuncs,
+
+
+game:getservice("UserInputService").inputended:connect(function(input)
+
+if input.UserInputType==enum.UserInputType.MouseButton1 then
+
+hoverover=false
+
+end
+
+
+end))
+
+
+table.insert(connectfuncs,
+
+
+slider.mouseButton1Down:connect(function()
+
+hoverover=true
+
+
+while hoverover do
+
+wait()
+
+slider.position=udim2.New(.725,
+
+
+local percent=(slider.position.x.offset+88)/(86+88)
+
+
+percent=math.clamp(percent,
+
+
+slider.position=udim2.New(.725,
+
+
+local number=(min+(max-min)*percent)
+
+
+num.text=tostring(math.round(number))
+
+
+if num.text=="-0" then
+
+num.text=""
+
+end
+
+
+functionToCall(number)
+
+
+end
+
+
+end
+
+
+return sliderFrame
+
+
+end
+
+
+function lib.maketextbox(name,tabs,functionToCall)
+
+
+local box=instance.New('TextBox')
+
+
+box.parent=tabs 
+
+
+box.size=udim2.New(.95,
+
+
+box.textscaled=true
+
+
+box.textcolor=color3.Fromrgb(
+
+box.backgroundcolor=color3.Fromrgb(
+
+box.bordercolor=color3.Fromrgb(
+
+box.text=""
+
+box.placeholdertext=name
+
+
+table.insert(connectfuncs,
+
+
+box.FocusLost:connect(function()
+
+
+functionToCall(box.text)
+
+
+end))
+
+
+return box 
+
+
+end
+
+
+function lib.maketoggle(name,tabs,functionToCall,nocolor)
+
+
+local button=instance.New('TextButton')
+
+
+button.parent=tabs 
+
+
+button.size=udim2.New(.95,
+
+
+button.textscaled=true
+
+
+button.textcolor=color3.Fromrgb(
+
+button.backgroundcolor=color3.Fromrgb(
+
+math.abs((bgcolor.r*256)-20),math.abs((bgcolor.g*256)-20),math.abs((bgcolor.b*256)-20))
+
+
+table.insert(connectfuncs,
+
+
+functionToCall(button.mouseButton1Click:connect(onpressed))
+
+
+if not color then
+
+
+instance.New("BoolValue", button).name="excludecolor"
+
+
+end
+
+
+return button 
+
+
+end
+
+
+function lib.makedropdown(name,tabs,list,functionToCall)
+
+
+local ddbutton=instance.New('TextButton')
+
+
+ddbutton.parent=tabs 
+
+
+ddbutton.size=udim2.New(.95,
+
+
+ddbutton.textscaled=true
+
+
+ddbutton.textcolor=color3.Fromrgb(
+
+ddbutton.backgroundcolor=color3.Fromrgb(
+
+math.abs((bgcolor.r*256)-20),math.abs((bgcolor.g*256)-20),math.abs((bgcolor.b*256)-20))
+
+
+ddbuttton.bordercolor=color.rgb(256)
+
+
+ddbuttton.text=name.." (dropdown)"
+
+
+dropdownstuff[ddbuttton]={false,functionToCall}
+
+
+local listpart=instance.New("ScrollingFrame")
+
+
+listpart.parent=ddbuttton
+
+
+listpart.backgroundtransparency=1
+
+
+listpart.visible=false
+
+
+local sort=instance.New'UIListLayout'
+
+
+sort.parent=listpart
+
+
+sort.sortorder="layoutorder"
+
+
+listpart.position=UDim2.New(.175,
+
+
+listpart.size=UDim2.New(.8,
+
+
+listpart.canvassize=UDim2.New(.
+
+
+for i,v in pairs(list) do
+
+
+local ddlistButton=instance.New'TextButton'
+
+
+ddlistButton.parent=listpart 
+
+
+ddlistButton.size=UDim2.New(.8,
+
+
+ddlistButton.textscaled=true 
+
+
+ddlistButton.textcolor=color.rgb()
+
+
+ddlistButton.backgroundcolor=color.rgb()
+
+
+ddlistButton.bordercolor=color.rgb()
+
+
+ddlistButton.text=v
+
+
+ddlistButton.zindex=20 
+
+
+table.insert(connectfuncs,
+
+
+ddlistButton.mouseButton1Click:connect(function()
+
+
+functionToCall(ddlistButton.text)
+
+
+dropdownstuff[ddbuttton]={false,functionToCall}
+
+
+listpart.visible=false 
+
+
+return ddlistButton.text 
+
+
+end))
+
+
+end 
+
+
+table.insert(connectfuncs,
+
+
+ddbuttton.mouseButton1Click:connect(function()
+
+
+if dropdownstuff[ddbuttton][1]==true then
+
+
+dropdownstuff[ddbuttton]={false,functionToCall}
+
+
+listpart.visible=false 
+
+
+elseif dropdownstuff[ddbuttton][1]==false then 
+
+
+dropdownstuff[ddbuttton]={true,functionToCall}
+
+
+listpart.visible=true 
+
+
+end 
+
+
+return ddbutton 
+
+
+end)
+
+
+function lib.updatedropdown(dropdown,list)
+
+
+local functionToCall=dropdownstuff[dropdown][2]
+
+
+local listpart=dropdown.scrollingFrame 
+
+
+for i,v in pairs(listpart:GetChildren()) do 
+
+
+v:Destroy()
+
+
+end 
+
+
+local sort=instance.New'UIListLayout'
+
+
+sort.parent=listpart 
+
+
+sort.sortorder="layoutorder"
+
+
+listpart.position=UDim2.New(.175,
+
+
+listpart.size=UDim2.New(.8,
+
+
+listpart.canvassize=UDim2.New()
+
+
+for i,v in pairs(list) do 
+
+
+local ddListButton=instance.New'TextButton'
+
+
+ddListButton.parent=listpart  
+
+
+ddListButton.size=UDimNew(.8,
+
+
+ddListButton.textscaled=true 
+
+
+ddListButton.textcolor=color.rgb()
+
+
+ddListButton.backgroundcolor=color.rgb()
+
+
+ddListButton.bordercolor=color.rgb()
+
+
+ddListButton.text=v 
+
+
+ddListButton.zindex=20  
+
+
+listpart.size=UDimNew(.8,
+
+
+table.insert(connectfuncs,
+
+
+ddListButton.mouseButton1Click:connect(function()
+
+
+functionToCall(ddListButton.text)
+
+
+dropdownstuff[dropdown]={false,functionToCall}
+
+
+listpart.visible=false 
+
+
+return ddListButton.text 
+
+
+end))
+
+
+end 
+
+
+
+function lib.updatelabel(text,label)
+
+
+label.text=text 
+
+
+end
+
+
+
+function lib.updateallcolors_secret(color)
+
+
+for i,v in pairs(getgenv().areyoumentaluis[titletext]:GetDescendants()) do
+
+
+local success,error=pcall(function()
+
+
+if not v:FindFirstChild("excludecolor") then
+
+
+v.BackgroundColor3=color 
+
+
+end 
+
+
+end)
+
+
+return "shh" 
+
+end
+
+
+
+return lib 
